@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import Controlador.CCandidato;
+import Controlador.CEleccion;
 import Controlador.CSufragante;
 import Controlador.CVotacion;
 
@@ -14,11 +15,12 @@ public class Instancia {
 	CSufragante sufragante  = new CSufragante();
 	CCandidato candidato = new CCandidato();
 	CVotacion votacion = new CVotacion();
+	CEleccion eleccion = new CEleccion();
 	public Instancia() {
 		
 	}
 	
-	public void Menu() throws SQLException {
+	public void Menu(int id) throws SQLException {
 		 Scanner scanner = new Scanner(System.in);
 
 	        // DatosVentas comven = new ControlVoto();
@@ -60,7 +62,7 @@ public class Instancia {
 	            	
 	                 //cargarvotante(int du, String nombre, String apellido, String domicilio, int edad, int genero )
 	                 
-	                Menu();
+	                Menu(id);
 	                break;
 	                
 	            case 2:
@@ -98,15 +100,15 @@ public class Instancia {
 	              	            	
 	                candidato.cargarcandidato(duc, partidoc, lemac, nombrec, apellidoc, generoc, edadc,domicilioc); 
 
-	                Menu();
+	                Menu(id);
 	                break;
 	            case 3:
 
 
 	            	System.out.println("----BIENVENIDO A VOTAR---");
 	            	System.out.println("INGRESE SU DU");
-               int duv1 = scanner.nextInt();
-	            sufragante.ValidarSufragante(duv1);
+               int dusv = scanner.nextInt();
+	            sufragante.ValidarSufragante(dusv);
 	               
 	            System.out.println("INGRESE UNA OPCION");
 	            System.out.println("1 --- VOTAR CANDIDATO");
@@ -126,22 +128,31 @@ public class Instancia {
 						System.out.println("<=========================================>");
 		                              
 		               System.out.println("INGRESE DU DE CANDIDATO A VOTAR");
-		               int duc1 = scanner.nextInt();
-		               	          
-		               
-		               votacion.Votar( duc1);
-	            	
-	            	
+		               int ducs = scanner.nextInt();
+		               	          		               
+		               votacion.Votar( ducs, dusv);
+		               sufragante.ActualizarSufragante(dusv);
+		               votacion.sumarvoto(ducs);
+		               Menu(id);	            	
 	            	break;
 	            case 2:
 	            	
+	            	votacion.impugnarvoto();
+	            	sufragante.ActualizarSufragante(dusv);
+	            	Menu(id);
 	            	break;
 	            case 3:	
 	            	
+	            	votacion.votoblando();
+	            	sufragante.ActualizarSufragante(dusv);
+	            	Menu(id);
 	            	break;
 	            	
 	             default:
 	                System.out.println("VOTO PUESTO COMO BLANCO");
+	            	votacion.votoblando();
+	            	sufragante.ActualizarSufragante(dusv);	                
+	            	Menu(id);
 	                break;	
 	            }
 	            
@@ -153,33 +164,66 @@ public class Instancia {
 	      
 	            	System.out.println("<=========================================>");
 					ArrayList<Sufragante> padronemitido = sufragante.padronvotantesok();
-					System.out.println("PADRON DE VOTANTES CON VOTOS EMITIDOS:");
+					System.out.println("PADRON DE VOTANTES");
 					sufragante.imprimirPadron(padronemitido);
 					System.out.println("<=========================================>");
 	            	
-					Menu();
+					Menu(id);
 	                break;
 	            case 5:
+ 	
+	            	System.out.println("<=========================================>");
+					ArrayList<Candidato> padronemitido1 = candidato.padroncandidatos();
+					System.out.println("PADRON CANDIDATOS:");
+					candidato.imprimirPadronCandidatos(padronemitido1);
+					System.out.println("<=========================================>");
 
-
+					Menu(id);
 	                break;
 	            case 6:
-	
+
+	            	System.out.println("<=================== VOTOS POR CANDIDATO =======================>");
+					ArrayList<Candidato> padronvotos = candidato.votosporcandidato();
+					candidato.votosporcandidatos(padronvotos);
+					System.out.println("<================================================================>");
+
+					
+					System.out.println("<====================== VOTOS POR PARTIDO========================>");
+					ArrayList<Candidato> padroVPARTIDOS = candidato.votosporpartido();
+					candidato.votosporpartido(padroVPARTIDOS);
+					System.out.println("<================================================================>");
+
+					Menu(id);
 
 	                break;
 
 	            case 7:
 
+	            	eleccion.escrutiniofinal(id);
+	            	
+	            	System.out.println("<=================== VOTOS POR CANDIDATO =======================>");
+					ArrayList<Candidato> pavoto = candidato.votosporcandidatofinal(id);
+					candidato.votosporcandidatos(pavoto);
+					System.out.println("<================================================================>");
+
+					
+					System.out.println("<====================== VOTOS POR PARTIDO========================>");
+					ArrayList<Candidato> padron = candidato.votosporpartidofinal(id);
+					candidato.votosporpartido(padron);
+					System.out.println("<================================================================>");
+
+					Menu(id);
+	            	
 	                break;
 
 	            case 8:
 
-	                Menu();
+	                
 
 	                break;
 	            case 9:
 
-	                Menu();
+	            	Menu(id);
 
 	                break;
 	            case 0:

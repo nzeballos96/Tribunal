@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 
 import Modelo.Conect;
 import Modelo.EGenero;
-import Modelo.Elecciones;
+import Modelo.Eleccion;
 import Modelo.ExcepcionCiudadanoMenordeEdad;
 import Modelo.Instancia;
 import Modelo.ExcepcionVotanteYaCargado;
@@ -21,6 +21,7 @@ public class CSufragante {
 	   static Conect cn = new Conect();
        static Instancia Instancia = new Instancia();
        private ArrayList<Sufragante> sufragantes;
+       static Eleccion Eleccion = new Eleccion();
        
        public CSufragante() {
 	        cn.conexion();
@@ -74,7 +75,7 @@ public class CSufragante {
     			
     			PreparedStatement ps = cn.conexion().prepareStatement("INSERT INTO sufragante "
     					+ "(DU, NOMBRE, APELLIDO, EDAD, GENERO, DOMICILIO, checkin)"
-    					+ " VALUES ( ? , ?, ?, ?, ?,?)");
+    					+ " VALUES ( ? , ?, ?, ?, ?,?,?)");
     			
     			ps.setInt(1, sufragante.getDU());
     			ps.setString(2, sufragante.getNombre());
@@ -93,22 +94,19 @@ public class CSufragante {
     		    
     		} catch (Exception e) {
     			System.out.println("NO SE PUDO CARGAR VOTANTE, SE REGRESA AL MENU" + e);
-    			Instancia.Menu();
+    			//Instancia.Menu(id);
     			e.printStackTrace();
     		}
-    			
-    		
+    					
     	}
 
 public ArrayList<Sufragante> padronvotantesok() throws SQLException {
-    Conect cn = new Conect();
     cn.conexion();
 
     String cargap = "SELECT du, nombre, apellido, edad, genero, domicilio, checkin from sufragante ";
 
     PreparedStatement statement = cn.conexion().prepareStatement(cargap);
     
-
     ResultSet rs = statement.executeQuery();
 
     while (rs.next()) {
@@ -128,8 +126,7 @@ public ArrayList<Sufragante> padronvotantesok() throws SQLException {
 }
 
 public void imprimirPadron(ArrayList<Sufragante> sufragantes) {
-//	System.out.println("|       DU | NOMBRE | APELLIDO | EDAD |  GENERO  |    DOMICILIO    |");
-//	System.out.println("|----------|--------|----------|------|----------|-----------------|");
+
 for (Sufragante sufragante : sufragantes) {
 	System.out.printf("DU " + sufragante.getDU() + " -- NOMBRE: " +  sufragante.getNombre() + " -- APELLIDO: " + 
     sufragante.getApellido() + "EDAD: " +
@@ -149,26 +146,35 @@ public void ValidarSufragante(int dusv) {
 
         // Si el votante ya existe, lanzamos una excepción
         if (rs.next() && rs.getInt(1) > 0) {
-        	System.out.println(" SUFRAGANTE ENCONTRADO");
-        	
-        	Sufragante sufragante = new Sufragante();
-        	sufragante.setDU(dusv);
-        	
-			String query = "UPDATE sufragante SET checkin =  1 WHERE du = ?";
-			PreparedStatement statement = cn.conexion().prepareStatement(query);
-	        statement.setInt(1, dusv);
-	        ResultSet rs1 = statement.executeQuery();
-        
+        	System.out.println(" SUFRAGANTE ENCONTRADO");      	
 	        
 		}else {
+			
         	System.out.println("EL SUFRAGANTE NO EXISTE");
         	
-        	Instancia.Menu();
+        	//Instancia.Menu();
         }
 		
 	} catch (Exception e) {
 		// TODO: handle exception
 	}
+}
+
+
+public void ActualizarSufragante(int dusv) {
+	try {
+		
+		cn.conexion();
+
+		String query = "UPDATE sufragante SET checkin = 1 WHERE du = ?";
+		PreparedStatement statement = cn.conexion().prepareStatement(query);
+		statement.setInt(1, dusv);
+
+		int updatedRows = statement.executeUpdate();
+
+} catch (Exception e) {
+	// TODO: handle exception
+}
 }
 	
 }

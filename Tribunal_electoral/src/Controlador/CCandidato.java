@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import Modelo.Conect;
 import Modelo.EGenero;
 import Modelo.EPartido;
+import Modelo.Eleccion;
 import Modelo.ExcepcionVotanteYaCargado;
 import Modelo.Instancia;
 import Modelo.Sufragante;
+import Modelo.Votacion;
 import Modelo.Candidato;
 
 public class CCandidato {
@@ -22,6 +24,7 @@ public class CCandidato {
     public CCandidato() {
 
 	        cn.conexion();
+	        Candidato candidato = new Candidato();
 	        candidatos = new ArrayList<>();
 	    }
 
@@ -83,18 +86,14 @@ public static void cargarcandidato(int duc, int partidoc, String lemac, String n
 			ps.setString(8, candidato.getLema());
 			ps.setInt(9, candidato.getVotorec());
 
-			
 			ps.execute();
 
 			System.out.println("CANDIDATO CARGADO");
 			cn.cerrar();
-			
-		
-
 	    
 	} catch (Exception e) {
 		System.out.println("NO SE PUDO CARGAR VOTANTE, SE REGRESA AL MENU" + e);
-		Instancia.Menu();
+	//	Instancia.Menu();
 		e.printStackTrace();
 	}
 	
@@ -102,7 +101,6 @@ public static void cargarcandidato(int duc, int partidoc, String lemac, String n
 }
 
 public ArrayList<Candidato> padroncandidatos() throws SQLException {
-    Conect cn = new Conect();
     cn.conexion();
 
     String cargap = "SELECT du, nombre, apellido, edad, genero, domicilio, partido, lema from candidato ";
@@ -130,8 +128,6 @@ public ArrayList<Candidato> padroncandidatos() throws SQLException {
 }
 	
 public void imprimirPadronCandidatos(ArrayList<Candidato> candidatos) {
-//	System.out.println("|       DU | NOMBRE | APELLIDO | EDAD |  GENERO  |    DOMICILIO    |");
-//	System.out.println("|----------|--------|----------|------|----------|-----------------|");
 for (Candidato candidato : candidatos) {
 	System.out.printf("DU " + candidato.getDU() + " -- NOMBRE: " +  candidato.getNombre() + " -- APELLIDO: " + 
 			candidato.getApellido() + "EDAD: " +
@@ -154,12 +150,147 @@ public void ValidarCanditato(int duc) {
         }else {
         	System.out.println("EL CANDIDATO NO EXISTE");
         	
-        	Instancia.Menu();
+   //     	Instancia.Menu();
         }
 		
 	} catch (Exception e) {
 		// TODO: handle exception
 	}
+}
+
+public ArrayList<Candidato> votosporcandidato() throws SQLException {
+    cn.conexion();
+
+    String cargap = "SELECT NOMBRE, APELLIDO, PARTIDO , LEMA, VOTOREC FROM candidato";
+
+    PreparedStatement statement = cn.conexion().prepareStatement(cargap);
+    
+    ResultSet rs = statement.executeQuery();
+
+    while (rs.next()) {
+        Candidato candidato = new Candidato();
+        candidato.setNombre(rs.getString("NOMBRE"));
+        candidato.setApellido(rs.getString("APELLIDO"));
+        candidato.setPartido(rs.getString("PARTIDO"));
+        candidato.setLema(rs.getString("LEMA"));
+        candidato.setVotorec(rs.getInt("VOTOREC"));
+
+        candidatos.add(candidato);
+    }
+
+    return candidatos;
+ 
+}
+
+
+public void votosporcandidatos(ArrayList<Candidato> candidatos) {
+
+for (Candidato candidato : candidatos) {    
+System.out.printf("-- NOMBRE: " +  candidato.getNombre() + " -- APELLIDO: " + candidato.getApellido() + 
+" -- PARTIDO " + candidato.getPartido() +  " -- LEMA " + candidato.getLema() +
+" -- VOTOS " + candidato.getVotorec()+ "%n");
+}
+}
+
+
+public ArrayList<Candidato> votosporpartido() throws SQLException {
+    cn.conexion();
+
+    String cargap = "SELECT PARTIDO, SUM(VOTOREC) AS votos from candidato GROUP BY PARTIDO ORDER BY PARTIDO";
+
+    PreparedStatement statement = cn.conexion().prepareStatement(cargap);
+    
+    ResultSet rs = statement.executeQuery();
+
+    while (rs.next()) {
+        Candidato candidato = new Candidato();
+        candidato.setPartido(rs.getString("PARTIDO"));
+        candidato.setVotorec(rs.getInt("VOTOS"));
+
+        candidatos.add(candidato);
+    }
+
+    return candidatos;
+}
+
+public void votosporpartido(ArrayList<Candidato> candidatos) {
+
+for (Candidato candidato : candidatos) {    
+System.out.printf(" -- PARTIDO " + candidato.getPartido() +
+" -- VOTOS " + candidato.getVotorec()+ "%n");
+}
+}
+
+public ArrayList<Candidato> votosporpartidofinal(int id) throws SQLException {
+    cn.conexion();
+
+    Eleccion eleccion = new Eleccion();
+    
+    eleccion.setId(id);
+    
+    String cargap = "SELECT PARTIDO, SUM(VOTOREC) AS votos from candidato_eleccion "
+    		+ "WHERE ID_ELECCION = ? GROUP BY PARTIDO ORDER BY PARTIDO";
+
+    PreparedStatement statement = cn.conexion().prepareStatement(cargap);
+    statement.setInt(1, eleccion.getId());
+    ResultSet rs = statement.executeQuery();
+
+    while (rs.next()) {
+        Candidato candidato = new Candidato();
+        candidato.setPartido(rs.getString("PARTIDO"));
+        candidato.setVotorec(rs.getInt("VOTOS"));
+
+        candidatos.add(candidato);
+    }
+
+    return candidatos;
+}
+
+public void votosporpartidofinal(ArrayList<Candidato> candidatos) {
+
+for (Candidato candidato : candidatos) {    
+System.out.printf(" -- PARTIDO " + candidato.getPartido() +
+" -- VOTOS " + candidato.getVotorec()+ "%n");
+}
+}
+
+public ArrayList<Candidato> votosporcandidatofinal(int id) throws SQLException {
+    cn.conexion();
+
+    Eleccion eleccion = new Eleccion();
+    
+    eleccion.setId(id);
+    
+    String cargap = "SELECT NOMBRE, APELLIDO, PARTIDO , LEMA, VOTOREC FROM candidato_eleccion"
+    		+ "WHERE ID_ELECCION = ?  ORDER BY VOTOREC DESC LIMIT 3;";
+
+    PreparedStatement statement = cn.conexion().prepareStatement(cargap);
+    statement.setInt(1, eleccion.getId());    
+    ResultSet rs = statement.executeQuery();
+
+    while (rs.next()) {
+        Candidato candidato = new Candidato();
+        candidato.setNombre(rs.getString("NOMBRE"));
+        candidato.setApellido(rs.getString("APELLIDO"));
+        candidato.setPartido(rs.getString("PARTIDO"));
+        candidato.setLema(rs.getString("LEMA"));
+        candidato.setVotorec(rs.getInt("VOTOREC"));
+
+        candidatos.add(candidato);
+    }
+
+    return candidatos;
+ 
+}
+
+
+public void votosporcandidatosfinal(ArrayList<Candidato> candidatos) {
+
+for (Candidato candidato : candidatos) {    
+System.out.printf("-- NOMBRE: " +  candidato.getNombre() + " -- APELLIDO: " + candidato.getApellido() + 
+" -- PARTIDO " + candidato.getPartido() +  " -- LEMA " + candidato.getLema() +
+" -- VOTOS " + candidato.getVotorec()+ "%n");
+}
 }
 
 }
