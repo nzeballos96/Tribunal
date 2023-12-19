@@ -1,20 +1,24 @@
 package Modelo;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import Controlador.CCandidato;
 import Controlador.CSufragante;
+import Controlador.CVotacion;
 
 public class Instancia {
 
 	
 	CSufragante sufragante  = new CSufragante();
 	CCandidato candidato = new CCandidato();
+	CVotacion votacion = new CVotacion();
 	public Instancia() {
 		
 	}
 	
-	public void Menu() {
+	public void Menu() throws SQLException {
 		 Scanner scanner = new Scanner(System.in);
 
 	        // DatosVentas comven = new ControlVoto();
@@ -62,26 +66,26 @@ public class Instancia {
 	            case 2:
 
 	            	System.out.println("----BIENVNIDO A AGREGAR CANDIDATO---");
-	               // System.out.println("INGRESE NOMBRE");
-	              //  String nombrec = scanner.next();
+	               System.out.println("INGRESE NOMBRE");
+	               String nombrec = scanner.next();
 
-	             //   System.out.println("INGRESE APELLIDO");
-	             //   String apellidoc = scanner.next();
+	                System.out.println("INGRESE APELLIDO");
+	              String apellidoc = scanner.next();
 
 	                System.out.println("INGRESE DNI");
 	                int duc = scanner.nextInt();
 
-	              //  System.out.println("SELECCIONES UN GENERO");
-	             //   for (int i = 0; i < EGenero.values().length; i++) {
-	              //      System.out.println(i + 1 + " - " + EGenero.values()[i].name());
-	             //   }
-	             //   int generoc = scanner.nextInt();
+	                System.out.println("SELECCIONES UN GENERO");
+	                for (int i = 0; i < EGenero.values().length; i++) {
+	                    System.out.println(i + 1 + " - " + EGenero.values()[i].name());
+	               }
+	                int generoc = scanner.nextInt();
 
-	             //   System.out.println("INGRESE EDAD");
-	             //   int edadc = scanner.nextInt();
+	                System.out.println("INGRESE EDAD");
+	                int edadc = scanner.nextInt();
 
-	            //    System.out.println("INGRESE DOMICILIO");
-	            //    String domicilioc = scanner.next();
+	                System.out.println("INGRESE DOMICILIO");
+	                String domicilioc = scanner.next();
 
 	                System.out.println("SELECCIONE UN PARTIDO:");
 	                for (int i = 0; i < EPartido.values().length; i++) {
@@ -91,23 +95,69 @@ public class Instancia {
 
 	                System.out.println("INGRESE LEMA");
 	                String lemac = scanner.next();
-	                
-	                System.out.println("ID ELECCION");
-	                int idelec = scanner.nextInt();
-	            	
-	                candidato.cargagarcandidato(duc, 
-	                		//edadc, apellidoc, nombrec, domicilioc, generoc, 
-	                		partidoc, lemac, idelec); 
+	              	            	
+	                candidato.cargarcandidato(duc, partidoc, lemac, nombrec, apellidoc, generoc, edadc,domicilioc); 
 
 	                Menu();
 	                break;
 	            case 3:
 
 
+	            	System.out.println("----BIENVENIDO A VOTAR---");
+	            	System.out.println("INGRESE SU DU");
+               int duv1 = scanner.nextInt();
+	            sufragante.ValidarSufragante(duv1);
+	               
+	            System.out.println("INGRESE UNA OPCION");
+	            System.out.println("1 --- VOTAR CANDIDATO");
+	            System.out.println("2 --- IMPUGNAR VOTO");
+	            System.out.println("3 --- VOTO EN BLANDO");
+	            
+	            int op = scanner.nextInt();
+	            
+	            switch(op) {
+	            case 1:
+
+	            	
+		               System.out.println("<=========================================>");
+						ArrayList<Candidato> padronemitido1 = candidato.padroncandidatos();
+						System.out.println("PADRON DE VOTANTES CON VOTOS EMITIDOS:");
+						candidato.imprimirPadronCandidatos(padronemitido1);
+						System.out.println("<=========================================>");
+		                              
+		               System.out.println("INGRESE DU DE CANDIDATO A VOTAR");
+		               int duc1 = scanner.nextInt();
+		               	          
+		               
+		               votacion.Votar( duc1);
+	            	
+	            	
+	            	break;
+	            case 2:
+	            	
+	            	break;
+	            case 3:	
+	            	
+	            	break;
+	            	
+	             default:
+	                System.out.println("VOTO PUESTO COMO BLANCO");
+	                break;	
+	            }
+	            
+
+
 	                break;
 	            case 4:
 
-
+	      
+	            	System.out.println("<=========================================>");
+					ArrayList<Sufragante> padronemitido = sufragante.padronvotantesok();
+					System.out.println("PADRON DE VOTANTES CON VOTOS EMITIDOS:");
+					sufragante.imprimirPadron(padronemitido);
+					System.out.println("<=========================================>");
+	            	
+					Menu();
 	                break;
 	            case 5:
 

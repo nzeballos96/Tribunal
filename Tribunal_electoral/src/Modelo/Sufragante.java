@@ -28,3 +28,4 @@ public class Sufragante extends Ciudadano{
 	//	super();
 	}	
 }
+

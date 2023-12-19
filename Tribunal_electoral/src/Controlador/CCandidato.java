@@ -2,13 +2,11 @@ package Controlador;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Scanner;
-
 import Modelo.Conect;
 import Modelo.EGenero;
 import Modelo.EPartido;
-import Modelo.ExcepcionCiudadanoMenordeEdad;
 import Modelo.ExcepcionVotanteYaCargado;
 import Modelo.Instancia;
 import Modelo.Sufragante;
@@ -16,18 +14,18 @@ import Modelo.Candidato;
 
 public class CCandidato {
 
-	   private Scanner scanner;
+
 	   static Conect cn = new Conect();
     static Instancia Instancia = new Instancia();
-    private ArrayList<Candidato> candidato;
+    private ArrayList<Candidato> candidatos;
     
     public CCandidato() {
-	        scanner = new Scanner(System.in);
+
 	        cn.conexion();
-	        
+	        candidatos = new ArrayList<>();
 	    }
 
-public static void cargagarcandidato(int duc, int partidoc, String lemac, int idelec) {
+public static void cargarcandidato(int duc, int partidoc, String lemac, String nombrec, String apellidoc, int generoc, int edadc, String domicilioc ) throws SQLException {
 		
 	 try {
 	        cn.conexion();
@@ -41,12 +39,12 @@ public static void cargagarcandidato(int duc, int partidoc, String lemac, int id
 	        ResultSet rs = statementrs.executeQuery();
 
 	        // Si el votante ya existe, lanzamos una excepción
-	        if (rs.next() && rs.getInt(1) < 0) {
-	            throw new ExcepcionVotanteYaCargado("EL CIUDADANO: " + duc + " NO EXISTE COMO SUFRAGANTE, DEBE CARGARLO PRIMERO");
+	        if (rs.next() && rs.getInt(1) > 0) {
+	            throw new ExcepcionVotanteYaCargado("EL CIUDADANO: " + duc + " EXISTE COMO SUFRAGANTE");
 	        }
 
 	        // Consulta para comprobar si el votante es candidato
-	        String validarcan = "SELECT COUNT(du_sufragante) FROM candidato WHERE du_sufragante = ?";
+	        String validarcan = "SELECT COUNT(du) FROM candidato WHERE du = ?";
 	        PreparedStatement statementrc = cn.conexion().prepareStatement(validarcan);
 	        statementrc.setInt(1, duc);
 	        ResultSet rc = statementrc.executeQuery();
@@ -55,27 +53,42 @@ public static void cargagarcandidato(int duc, int partidoc, String lemac, int id
 	        if (rc.next() && rc.getInt(1) > 0) {
 	            throw new ExcepcionVotanteYaCargado("EL CIUDADANO: " + duc + " YA FIGURA COMO CANDIDATO");
 	        }
-	
-
-		    		
-	        candidato.setDU(duc);
+		      
+	        
+			int votorec = 0;    		
+    		
+			candidato.setDU(duc);
+			candidato.setNombre(nombrec);
+			candidato.setApellido(apellidoc);
+			candidato.setDomicilio(domicilioc);
+			candidato.setGenero(EGenero.values()[generoc - 1].name());
 			candidato.setPartido(EPartido.values()[partidoc - 1].name());
 			candidato.setLema(lemac);
+			candidato.setEdad(edadc);
+			candidato.setVotorec(votorec);
 			
+			candidato.setVotorec(votorec);
 			    		
 			
-			PreparedStatement ps = cn.conexion().prepareStatement("INSERT INTO candidato (LEMA, PARTIDO, ID_ELECCION, DU_SUFRAGANTE) VALUES (?, ?, ?, ?)");
+			PreparedStatement ps = cn.conexion().prepareStatement("INSERT INTO candidato "
+					+ "(DU, APELLIDO, NOMBRE, edad, GENERO, DOMICILIO, PARTIDO, LEMA, VOTOREC) VALUES (?, ?, ?, ?, ?, ?, ?, ?,9)");
 			
-			
-			
-			ps.setString(1, candidato.getLema());
-			ps.setString(2, candidato.getPartido());
-			ps.setInt(3, idelec);
-			ps.setInt(4, candidato.getDU());
+			ps.setInt(1, candidato.getDU());
+			ps.setString(3, candidato.getApellido());
+			ps.setString(2, candidato.getNombre());
+			ps.setInt(4, candidato.getEdad());
+			ps.setString(5, candidato.getGenero());
+			ps.setString(6, candidato.getDomicilio());
+			ps.setString(7, candidato.getPartido());
+			ps.setString(8, candidato.getLema());
+			ps.setInt(9, candidato.getVotorec());
+
 			
 			ps.execute();
 
 			System.out.println("CANDIDATO CARGADO");
+			cn.cerrar();
+			
 		
 
 	    
@@ -86,154 +99,67 @@ public static void cargagarcandidato(int duc, int partidoc, String lemac, int id
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/*try {
-		cn.conexion();
-		Candidato candidato = new Candidato();
-		
-		String validarsuf =  "select du from sufragante where du = ? ";
-		PreparedStatement statementrs = cn.conexion().prepareStatement(validarsuf);
-	    statementrs.setInt(1, duc);
+}
 
-	    ResultSet rs = statementrs.executeQuery();
-	    
-	    if (rs != null) {
-	    	
-	    	String validarcan =  "select du from candidato where du = ?";
-			PreparedStatement statementrc = cn.conexion().prepareStatement(validarcan);
-		    statementrc.setInt(1, duc);
+public ArrayList<Candidato> padroncandidatos() throws SQLException {
+    Conect cn = new Conect();
+    cn.conexion();
 
-		    ResultSet rc = statementrc.executeQuery();
-		    
-		    if (rc != null) {
-		    	
-		    	if (edadc <= 16 ) {
-		    		System.out.println("ERROR, NO SE PUEDE CARGAR UN VOTANTE MENOR");
-		    	}
-		    	else {
-		    		
-		int votorec = 0;    		
-		    		
-		candidato.setDU(duc);
-		candidato.setNombre(nombrec);
-		candidato.setApellido(apellidoc);
-		candidato.setDomicilio(domicilioc);
-		candidato.setGenero(EGenero.values()[generoc - 1].name());
-		candidato.setPartido(EGenero.values()[generoc - 1].name());
-		candidato.setLema(lemac);
-		candidato.setEdad(edadc);
-		
-		candidato.setVotorec(votorec);
-		    		
-		
-		PreparedStatement ps = cn.conexion().prepareStatement("INSERT INTO candidato "
-				+ "(DU, APELLIDO, NOMBRE, GENERO, DOMICILIO, PARTIDO, LEMA, VOTOREC) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-		
-		ps.setInt(1, candidato.getDU());
-		ps.setString(3, candidato.getApellido());
-		ps.setString(2, candidato.getNombre());		
-		ps.setString(4, candidato.getGenero());
-		ps.setString(5, candidato.getDomicilio());
-		ps.setString(6, candidato.getPartido());
-		ps.setString(7, candidato.getLema());
-		ps.setInt(8, candidato.getVotorec());
+    String cargap = "SELECT du, nombre, apellido, edad, genero, domicilio, partido, lema from candidato ";
 
-		
-		ps.execute();
+    PreparedStatement statement = cn.conexion().prepareStatement(cargap);
+    
 
-		System.out.println("CANDIDATO CARGADO");
-		cn.cerrar();
-		
-		    	}
-		    	
-		    }
-		    else {
-		    	
-		    	throw new ExcepcionVotanteYaCargado("EL VOTANTE DU : " + duc + " YA FIGURA COMO CANDIDATO");
-		    	
-		    }
-	    	
-	    }else {
-	    	
-	    	throw new ExcepcionVotanteYaCargado("EL DU : " + duc + " YA SE ENCUENTA EN NUESTRO SISTEMA COMO VOTANTE");
-	    	
-	    }
-	    
-	} catch (Exception e) {
-		System.out.println("NO SE PUDO CARGAR CANDIDATO, SE REGRESA AL MENU" + e);
-		Instancia.Menu();
-		e.printStackTrace();
-	}*/
-		
-	
+    ResultSet rs = statement.executeQuery();
+
+    while (rs.next()) {
+        Candidato candidato = new Candidato();
+        candidato.setDU(rs.getInt("DU"));
+        candidato.setNombre(rs.getString("NOMBRE"));
+        candidato.setApellido(rs.getString("APELLIDO"));
+        candidato.setEdad(rs.getInt("EDAD"));
+        candidato.setGenero(rs.getString("GENERO"));
+        candidato.setDomicilio(rs.getString("DOMICILIO"));
+        candidato.setPartido(rs.getString("PARTIDO"));
+        candidato.setLema(rs.getString("LEMA"));
+
+        candidatos.add(candidato );
+    }
+
+    return candidatos;
 }
 	
+public void imprimirPadronCandidatos(ArrayList<Candidato> candidatos) {
+//	System.out.println("|       DU | NOMBRE | APELLIDO | EDAD |  GENERO  |    DOMICILIO    |");
+//	System.out.println("|----------|--------|----------|------|----------|-----------------|");
+for (Candidato candidato : candidatos) {
+	System.out.printf("DU " + candidato.getDU() + " -- NOMBRE: " +  candidato.getNombre() + " -- APELLIDO: " + 
+			candidato.getApellido() + "EDAD: " +
+			candidato.getEdad() + " -- GENERO: " + candidato.getGenero() + " -- DOMICILIO " + candidato.getDomicilio()
+	+ " -- PARTIDO " + candidato.getPartido() +  " -- LEMA " + candidato.getLema() + "%n");
+}
+}
+
+public void ValidarCanditato(int duc) {
+	try {
+		
+		String validarcan = "SELECT COUNT(du) FROM candidato WHERE du = ?";
+        PreparedStatement statementrc = cn.conexion().prepareStatement(validarcan);
+        statementrc.setInt(1, duc);
+        ResultSet rc = statementrc.executeQuery();
+
+        // Si el votante es candidato, lanzamos una excepción
+        if (rc.next() && rc.getInt(1) > 0) {
+            System.out.println("CANDIDATO ENCONTRADO");
+        }else {
+        	System.out.println("EL CANDIDATO NO EXISTE");
+        	
+        	Instancia.Menu();
+        }
+		
+	} catch (Exception e) {
+		// TODO: handle exception
+	}
+}
+
 }
