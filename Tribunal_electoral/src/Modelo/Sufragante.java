@@ -3,25 +3,28 @@ package Modelo;
 
 public class Sufragante extends Ciudadano{
 
-	Boolean checkin;
+	int checkin;
 
-	public Boolean getCheckin() {
+
+
+	public int getCheckin() {
 		return checkin;
 	}
 
-	public void setCheckin(Boolean checkin) {
+
+
+	public void setCheckin(int checkin) {
 		this.checkin = checkin;
 	}
 
-	public Sufragante(int dU, int edad, String apellido, String nombre, String domicilio, EGenero genero,
-			Boolean checkin) {
+
+
+	public Sufragante(int dU, int edad, String apellido, String nombre, String domicilio, String genero, int checkin) {
 		super(dU, edad, apellido, nombre, domicilio, genero);
 		this.checkin = checkin;
 	}
 
-	public Sufragante(int dU, int edad, String apellido, String nombre, String domicilio, EGenero genero) {
-		super(dU, edad, apellido, nombre, domicilio, genero);
-	}
-	
-	
+	public Sufragante() {
+	//	super();
+	}	
 }

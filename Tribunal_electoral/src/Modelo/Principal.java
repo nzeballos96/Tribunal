@@ -6,8 +6,8 @@ public class Principal {
 		// TODO Auto-generated method stub
 
 		
-		Elecciones elecciones = new Elecciones();
-		elecciones.Menu();
+		Instancia Instancia = new Instancia();
+		Instancia.Menu();
 		
 	}
 

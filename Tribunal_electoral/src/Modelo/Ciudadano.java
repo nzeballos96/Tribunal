@@ -3,8 +3,7 @@ package Modelo;
 public class Ciudadano {
 
 	int DU, Edad;
-	String Apellido, Nombre, Domicilio;
-	EGenero Genero;
+	String Apellido, Nombre, Domicilio, Genero;
 	public int getDU() {
 		return DU;
 	}
@@ -35,13 +34,13 @@ public class Ciudadano {
 	public void setDomicilio(String domicilio) {
 		Domicilio = domicilio;
 	}
-	public EGenero getGenero() {
+	public String getGenero() {
 		return Genero;
 	}
-	public void setGenero(EGenero genero) {
+	public void setGenero(String genero) {
 		Genero = genero;
 	}
-	public Ciudadano(int dU, int edad, String apellido, String nombre, String domicilio, EGenero genero) {
+	public Ciudadano(int dU, int edad, String apellido, String nombre, String domicilio, String genero) {
 		super();
 		DU = dU;
 		Edad = edad;
@@ -51,7 +50,7 @@ public class Ciudadano {
 		Genero = genero;
 	}
 	public Ciudadano() {
-		super();
+	//	super();
 	}
 	
 	

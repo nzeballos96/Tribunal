@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 
 public class Conect {
 
-    String base = "sistemaelectoral";
+    String base = "elecciones_sistema";
     String url = "jdbc:mysql://localhost:3306/";
     String usuario = "root";
     String contraseña = "";
