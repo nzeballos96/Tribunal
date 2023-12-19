@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 import Controlador.CCandidato;
 import Controlador.CEleccion;
 import Controlador.CSufragante;
@@ -32,8 +34,7 @@ public class Instancia {
 	        System.out.println("5. --> CANDIDATOS");
 	        System.out.println("6. --> ESCRUTINIO PROVISORIO");
 	        System.out.println("7. --> ESCRUTINIO DEFINITIVO");
-	        System.out.println("8. --> CARGAR NUEVO PARTIDO");
-	        System.out.println("9. --< Acerca de >--");
+	        System.out.println("8. --< Acerca de >--");
 	        System.out.println("0. --> Salir <--");
 
 	        int opcion = scanner.nextInt();
@@ -218,14 +219,12 @@ public class Instancia {
 
 	            case 8:
 
-	                
-
-	                break;
-	            case 9:
-
+	                JOptionPane.showConfirmDialog(null, "ZEBALLOS NICOLAS, 19/12/2023");
 	            	Menu(id);
+	            	
 
 	                break;
+
 	            case 0:
 	                System.out.println("Gracias por usar el menú");
 	                System.exit(0);
